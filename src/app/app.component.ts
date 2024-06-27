@@ -13,35 +13,39 @@ import {FormsModule} from "@angular/forms";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent{
   chartOptions: any = {};
-  private intervalId: any;
-  private subscription: Subscription | undefined;
+  intervalId: any;
+  subscription: Subscription | undefined;
   url: string | null = '';
-  cookie: string | null = '';
+  user: string | null = '';
+  password: string | null = '';
 
   constructor(private repo: RepositoryService,@Inject(PLATFORM_ID) private platformId:any) {
 
 
     if(isPlatformBrowser(platformId)){
       this.url =  localStorage.getItem("url")
-      this.cookie =  localStorage.getItem("cookie")
+      this.user =  localStorage.getItem("user")
+      this.password =  localStorage.getItem("password")
+      this.load()
+      this.intervalId = setInterval(() => {
+        this.load()
+      }, 300000); // 300,000 ms = 5 minutes
     }
   }
 
-
-  startApiCalls(): void {
-    this.intervalId = setInterval(() => {
-      this.subscription = this.repo.getData()?.subscribe(data => {
-        this.loadData(data)
-      })
-    }, 15000); // 300,000 ms = 5 minutes
+  load(): void {
+    this.subscription = this.repo.getData()?.subscribe(data => {
+      this.loadData(data)
+    })
   }
 
   saveToLocalStorage(): void {
     if(isPlatformBrowser(this.platformId)){
       localStorage.setItem('url', this.url!);
-      localStorage.setItem('cookie', this.cookie!);
+      localStorage.setItem('user', this.user!);
+      localStorage.setItem('password', this.password!);
     }
 
 
@@ -67,13 +71,13 @@ export class AppComponent {
       animationEnabled: true,
       theme: "light2",
       title: {
-        text: "Actual vs Projected Sales"
+        text: "Actual vs Projected Power"
       },
       axisX: {
         valueFormatString: "HH:mm"
       },
       axisY: {
-        title: "Number of Sales"
+        title: "Graphic"
       },
       toolTip: {
         shared: true

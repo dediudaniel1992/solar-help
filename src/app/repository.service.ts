@@ -17,7 +17,8 @@ export class RepositoryService {
     return this.http.get("/solar/data",
       {params:
           {url:encodeURIComponent(localStorage.getItem("url")!),
-            cookie:encodeURIComponent(localStorage.getItem("cookie")!)
+            user:encodeURIComponent(localStorage.getItem("user")!),
+            password:encodeURIComponent(localStorage.getItem("password")!)
       }})
   }
 }
