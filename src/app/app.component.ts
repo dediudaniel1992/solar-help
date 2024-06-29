@@ -6,7 +6,7 @@ import {CanvasJSAngularChartsModule} from '@canvasjs/angular-charts';
 import {Subscription} from "rxjs";
 import {FormsModule} from "@angular/forms";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
-import {MatCardModule, MatCardActions, MatCardHeader} from "@angular/material/card";
+import {MatCardActions, MatCardHeader, MatCardModule} from "@angular/material/card";
 import {MatFormFieldModule, MatLabel} from "@angular/material/form-field";
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from "@angular/material/button";
@@ -15,8 +15,8 @@ import {MatListModule} from '@angular/material/list';
 
 
 class Trigger {
-  url: String | undefined;
-  threshold: Number | undefined
+  url: string;
+  threshold: number
 
   constructor(url: string, threshold: number) {
     this.url = url;
@@ -39,6 +39,7 @@ export class AppComponent {
   user: string | null = '';
   password: string | null = '';
   triggers: Trigger[] = []
+  intervalMiliSeconds = 300000
 
   constructor(private repo: RepositoryService, @Inject(PLATFORM_ID) private platformId: any) {
 
@@ -54,7 +55,7 @@ export class AppComponent {
       this.load()
       this.intervalId = setInterval(() => {
         this.load()
-      }, 300000); // 300,000 ms = 5 minutes
+      }, this.intervalMiliSeconds); // 300,000 ms = 5 minutes
     }
   }
 
@@ -88,13 +89,24 @@ export class AppComponent {
   }
 
   trigger(result: any) {
+
+    let now = new Date();
+    let window = new Date(now.getTime() - this.intervalMiliSeconds)
     Array.from(result.xAxis).forEach((x, i) => {
       let copy: string = x as string;
       const formattedDateString = copy.replace(' ', 'T');
       const time = new Date(formattedDateString);
       let value = Number.parseFloat(result.productPower[i])
-      if (value) {
-        console.log(time, value)
+      if (!Number.isNaN(value)) {
+        if (time > window && time < now)
+          this.triggers.forEach(trigger => {
+            if (value >= trigger.threshold) {
+              this.repo.trigger(trigger.url, "on")?.subscribe((result) => console.log(result))
+            } else {
+              this.repo.trigger(trigger.url, "off")?.subscribe((result) => console.log(result))
+            }
+          })
+
       }
     })
   }
@@ -119,7 +131,7 @@ export class AppComponent {
       animationEnabled: true,
       theme: "light2",
       title: {
-        text: "Actual vs Projected Power"
+        text: "Consum"
       },
       axisX: {
         valueFormatString: "HH:mm"

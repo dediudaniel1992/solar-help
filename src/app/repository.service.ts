@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpClientModule} from "@angular/common/http";
+import {HttpClient, HttpClientModule, HttpHeaders} from "@angular/common/http";
 import {Observable} from "rxjs";
 
 
@@ -21,20 +21,20 @@ export class RepositoryService {
           {
             url: encodeURIComponent(localStorage.getItem("url")!),
             user: encodeURIComponent(localStorage.getItem("user")!),
-            password: encodeURIComponent(localStorage.getItem("password")!)
+            password: btoa(encodeURIComponent(localStorage.getItem("password")!))
           }
       })
   }
 
-  public trigger(): Observable<any> | undefined | null {
+  public trigger(url: string, command: string): Observable<any> | undefined | null {
+    let body = {
+      url: encodeURIComponent(url),
+      command: command
+    }
+    let headers: HttpHeaders = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    return this.http.post("/solar/trigger", body, {headers})
 
-    return this.http.post("/solar/data",
-      {
-        params:
-          {
-            url: encodeURIComponent(localStorage.getItem("url")!),
-          }
-      })
   }
 
 }
