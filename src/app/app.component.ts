@@ -6,6 +6,7 @@ import {CanvasJSAngularChartsModule} from '@canvasjs/angular-charts';
 import {Subscription} from "rxjs";
 import {FormsModule} from "@angular/forms";
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
