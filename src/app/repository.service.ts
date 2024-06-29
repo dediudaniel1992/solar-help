@@ -10,15 +10,31 @@ import {Observable} from "rxjs";
 })
 export class RepositoryService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  public getData():Observable<any> | undefined | null{
+  public getData(): Observable<any> | undefined | null {
 
     return this.http.get("/solar/data",
-      {params:
-          {url:encodeURIComponent(localStorage.getItem("url")!),
-            user:encodeURIComponent(localStorage.getItem("user")!),
-            password:encodeURIComponent(localStorage.getItem("password")!)
-      }})
+      {
+        params:
+          {
+            url: encodeURIComponent(localStorage.getItem("url")!),
+            user: encodeURIComponent(localStorage.getItem("user")!),
+            password: encodeURIComponent(localStorage.getItem("password")!)
+          }
+      })
   }
+
+  public trigger(): Observable<any> | undefined | null {
+
+    return this.http.post("/solar/data",
+      {
+        params:
+          {
+            url: encodeURIComponent(localStorage.getItem("url")!),
+          }
+      })
+  }
+
 }

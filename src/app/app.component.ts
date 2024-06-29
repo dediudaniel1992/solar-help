@@ -1,34 +1,56 @@
 import {Component, Inject, PLATFORM_ID} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {RepositoryService} from "./repository.service";
-import {isPlatformBrowser, JsonPipe} from "@angular/common";
+import {isPlatformBrowser, JsonPipe, NgIf} from "@angular/common";
 import {CanvasJSAngularChartsModule} from '@canvasjs/angular-charts';
 import {Subscription} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {MatCardModule, MatCardActions, MatCardHeader} from "@angular/material/card";
+import {MatFormFieldModule, MatLabel} from "@angular/material/form-field";
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from "@angular/material/button";
+import {MatIconModule} from '@angular/material/icon';
+import {MatListModule} from '@angular/material/list';
 
+
+class Trigger {
+  url: String | undefined;
+  threshold: Number | undefined
+
+  constructor(url: string, threshold: number) {
+    this.url = url;
+    this.threshold = threshold;
+  }
+}
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, JsonPipe, CanvasJSAngularChartsModule, FormsModule],
+  imports: [RouterOutlet, JsonPipe, CanvasJSAngularChartsModule, FormsModule, MatSlideToggle, MatCardModule, MatCardHeader, MatFormFieldModule, MatLabel, MatInputModule, MatButtonModule, MatCardActions, NgIf, MatIconModule, MatListModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent{
+export class AppComponent {
   chartOptions: any = {};
   intervalId: any;
   subscription: Subscription | undefined;
   url: string | null = '';
   user: string | null = '';
   password: string | null = '';
+  triggers: Trigger[] = []
 
-  constructor(private repo: RepositoryService,@Inject(PLATFORM_ID) private platformId:any) {
+  constructor(private repo: RepositoryService, @Inject(PLATFORM_ID) private platformId: any) {
 
 
-    if(isPlatformBrowser(platformId)){
-      this.url =  localStorage.getItem("url")
-      this.user =  localStorage.getItem("user")
-      this.password =  localStorage.getItem("password")
+    if (isPlatformBrowser(platformId)) {
+      this.url = localStorage.getItem("url")
+      this.user = localStorage.getItem("user")
+      this.password = localStorage.getItem("password")
+      let triggers = localStorage.getItem("triggers")
+      if (triggers) {
+        this.triggers = JSON.parse(triggers)
+      }
       this.load()
       this.intervalId = setInterval(() => {
         this.load()
@@ -43,13 +65,38 @@ export class AppComponent{
   }
 
   saveToLocalStorage(): void {
-    if(isPlatformBrowser(this.platformId)){
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('url', this.url!);
       localStorage.setItem('user', this.user!);
       localStorage.setItem('password', this.password!);
     }
+  }
 
+  syncTriggers(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('triggers', JSON.stringify(this.triggers));
+    }
+  }
 
+  addTrigger() {
+    let trigger = new Trigger("", 0)
+    this.triggers.push(trigger)
+  }
+
+  removeTrigger() {
+    this.triggers.pop()
+  }
+
+  trigger(result: any) {
+    Array.from(result.xAxis).forEach((x, i) => {
+      let copy: string = x as string;
+      const formattedDateString = copy.replace(' ', 'T');
+      const time = new Date(formattedDateString);
+      let value = Number.parseFloat(result.productPower[i])
+      if (value) {
+        console.log(time, value)
+      }
+    })
   }
 
   loadData(data: any) {
@@ -58,7 +105,7 @@ export class AppComponent{
     let dpsUsePower: any = [];
     let result = data.data;
 
-
+    this.trigger(result)
     Array.from(result.xAxis).forEach((x, i) => {
       let copy: string = x as string;
       const formattedDateString = copy.replace(' ', 'T');

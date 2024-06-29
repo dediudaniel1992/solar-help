@@ -5,18 +5,60 @@
 </style>
 
 <main class="main">
-  <div>
-    <h1>Solar Help</h1>
-    <input  type="text" [(ngModel)]="url" placeholder="Url for login" />
-    <input type="text" [(ngModel)]="user" placeholder="User for api" />
-    <input type="password" [(ngModel)]="password" placeholder="Password for api" />
-    <button (click)="saveToLocalStorage()">Save</button>
-  </div>
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>
+        Solar Help
+      </mat-card-title>
+    </mat-card-header>
+    <form #form="ngForm">
+      <mat-form-field class="example-full-width" matFormFieldControl="url">
+        <mat-label>Url</mat-label>
+        <input matInput matFormFieldControl="url" type="text" name="url" [(ngModel)]="url" placeholder="Url for login">
 
-  <div>
+      </mat-form-field>
 
-  </div>
-  <div>
+      <mat-form-field class="example-full-width" matFormFieldControl="url">
+        <mat-label>Username</mat-label>
+        <input matInput type="text"  name="user" [(ngModel)]="user" placeholder="User for api">
+
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width" matFormFieldControl="url">
+        <mat-label>Password</mat-label>
+        <input matInput  type="password" name="password" [(ngModel)]="password" placeholder="Password for api" />
+      </mat-form-field>
+    <button (click)="saveToLocalStorage()"  mat-flat-button class="mat-accent">Save</button>
+    </form>
+  </mat-card>
+
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Triggers</mat-card-title>
+    </mat-card-header>
+    <mat-card-actions align="end">
+      <button mat-button (click)="addTrigger()">
+        <mat-icon aria-hidden="false" fontIcon="add"></mat-icon>
+      </button>
+      <button mat-button (click)="removeTrigger()">
+        <mat-icon aria-hidden="false" fontIcon="remove"></mat-icon>
+      </button>
+      <button (click)="syncTriggers()"  mat-flat-button class="mat-accent">Save</button>
+    </mat-card-actions>
+    <mat-list role="list" >
+      @for (trigger of triggers; track trigger) {
+        <mat-list-item role="listitem">
+          <input matInput type="text"  name="user" [(ngModel)]="trigger.url" placeholder="Url for trigger">
+          <input matInput type="number"   min="1" max="100" name="user" [(ngModel)]="trigger.threshold" placeholder="Threshold for trigger">
+        </mat-list-item>
+      }
+    </mat-list>
+
+  </mat-card>
+
+
+
+  <div *ngIf="chartOptions">
     <canvasjs-chart [options]="chartOptions" [styles]="{width: '100%', height:'460px'}"></canvasjs-chart>
   </div>
 
