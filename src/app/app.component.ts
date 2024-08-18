@@ -97,10 +97,11 @@ export class AppComponent {
       const formattedDateString = copy.replace(' ', 'T');
       const time = new Date(formattedDateString);
       let value = Number.parseFloat(result.productPower[i])
+      let totalConsumtion = Number.parseFloat(result.usePower[i])
       if (!Number.isNaN(value)) {
         if (time > window && time < now)
           this.triggers.forEach(trigger => {
-            if (value >= trigger.threshold) {
+            if (( totalConsumtion - value) >= trigger.threshold) {
               this.repo.trigger(trigger.url, "on")?.subscribe((result) => console.log(result))
             } else {
               this.repo.trigger(trigger.url, "off")?.subscribe((result) => console.log(result))
