@@ -101,7 +101,7 @@ export class AppComponent {
       if (!Number.isNaN(value)) {
         if (time > window && time < now)
           this.triggers.forEach(trigger => {
-            if (( totalConsumtion - value) >= trigger.threshold) {
+            if (( value - totalConsumtion) >= trigger.threshold) {
               this.repo.trigger(trigger.url, "on")?.subscribe((result) => console.log(result))
             } else {
               this.repo.trigger(trigger.url, "off")?.subscribe((result) => console.log(result))
